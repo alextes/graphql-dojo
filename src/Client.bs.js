@@ -11,7 +11,7 @@ var inMemoryCache = ApolloInMemoryCache.createInMemoryCache(/* None */0, /* None
 var httpLink = ApolloLinks.createHttpLink("https://api.github.com/graphql", /* None */0, /* None */0, /* Some */[Js_dict.fromList(/* :: */[
             /* tuple */[
               "Authorization",
-              "bearer bda1a848781600ce3150fa64f6012fcc23495fdb"
+              "bearer TOKEN"
             ],
             /* [] */0
           ])], /* None */0, /* None */0, /* () */0);

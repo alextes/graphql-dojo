@@ -39,7 +39,29 @@ let (|?) = (opt, default) =>
   | Some(value) => value
   };
 
-let renderViewerDetails = (viewer) =>
+let renderRepositoryList = repositories =>
+  <ul>
+    (
+      ReasonReact.createDomElement(
+        "div",
+        ~props={"className": "whatever"},
+        Js.Array.map(
+          edge =>
+            <li>
+              (
+                switch (edge##node) {
+                | None => ReasonReact.string("No node")
+                | Some(node) => ReasonReact.string(node##name)
+                }
+              )
+            </li>,
+          repositories##edges |? [%raw {| [] |}],
+        ),
+      )
+    )
+  </ul>;
+
+let renderViewerDetails = viewer =>
   <div>
     <h2> (viewer##name |? "No name" |> ReasonReact.string) </h2>
     <h3> (viewer##email |> ReasonReact.string) </h3>
@@ -57,7 +79,11 @@ let make = _children => {
              | Error(error) =>
                Js.log(error);
                <div> (ReasonReact.string("error")) </div>;
-             | Data(response) => renderViewerDetails(response##viewer)
+             | Data(response) =>
+               <div>
+                 (renderViewerDetails(response##viewer))
+                 (renderRepositoryList(response##viewer##repositories))
+               </div>
              }
          )
     </GetRepositoryListQuery>,
