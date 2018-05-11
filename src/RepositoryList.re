@@ -54,7 +54,7 @@ let renderRepositoryList = repositories =>
         ReasonReact.createDomElement(
           "div",
           ~props={"className": "whatever"},
-          Js.Array.map(
+          Array.map(
             edge =>
               switch (edge) {
               | None => <li> (ReasonReact.string("No edge")) </li>
@@ -64,7 +64,6 @@ let renderRepositoryList = repositories =>
                     switch (edge##node) {
                     | None => ReasonReact.string("No node")
                     | Some(node) => renderEdgeNode(node)
-                    /* ReasonReact.string(node##name) */
                     }
                   )
                 </li>
