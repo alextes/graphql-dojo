@@ -10,7 +10,7 @@ var Caml_exceptions = require("bs-platform/lib/js/caml_exceptions.js");
 
 var Graphql_error = Caml_exceptions.create("RepositoryList-ReactTemplate.GetRepositoryList.Graphql_error");
 
-var query = "query getRepositoryList  {\nviewer  {\nname  \nemail  \nrepositories(first: 10)  {\nedges  {\nnode  {\nid  \nname  \n}\n}\n}\n}\n}";
+var query = "query getRepositoryList  {\nviewer  {\nname  \nemail  \nrepositories(first: 10, orderBy: {field: STARGAZERS, direction: DESC})  {\nedges  {\nnode  {\nid  \nname  \nviewerHasStarred  \n}\n}\n}\n}\n}";
 
 function parse(value) {
   var match = Js_json.decodeObject(value);
@@ -90,9 +90,18 @@ function parse(value) {
                             } else {
                               throw Graphql_error;
                             }
+                            var value$5 = value$2["viewerHasStarred"];
+                            var match$6 = Js_json.decodeBoolean(value$5);
+                            var tmp$5;
+                            if (match$6) {
+                              tmp$5 = match$6[0];
+                            } else {
+                              throw Graphql_error;
+                            }
                             tmp$2 = {
                               id: tmp$3,
-                              name: tmp$4
+                              name: tmp$4,
+                              viewerHasStarred: tmp$5
                             };
                           } else {
                             throw Graphql_error;
@@ -198,6 +207,33 @@ function $pipe$unknown(opt, $$default) {
   }
 }
 
+function renderEdgeNode(node) {
+  var match = node.viewerHasStarred;
+  if (match) {
+    return node.name + "🌟";
+  } else {
+    return node.name + "😭";
+  }
+}
+
+function renderRepositoryList(repositories) {
+  var match = repositories.edges;
+  if (match) {
+    return React.createElement("ul", undefined, ReasonReact.createDomElement("div", {
+                    className: "whatever"
+                  }, match[0].map((function (edge) {
+                          if (edge) {
+                            var match = edge[0].node;
+                            return React.createElement("li", undefined, match ? renderEdgeNode(match[0]) : "No node");
+                          } else {
+                            return React.createElement("li", undefined, "No edge");
+                          }
+                        }))));
+  } else {
+    return React.createElement("div", undefined, "No repository edges");
+  }
+}
+
 function renderViewerDetails(viewer) {
   return React.createElement("div", undefined, React.createElement("h2", undefined, $pipe$unknown(viewer.name, "No name")), React.createElement("h3", undefined, viewer.email));
 }
@@ -233,7 +269,8 @@ function make$1() {
                                       return React.createElement("div", undefined, "No Data");
                                     }
                                   } else if (result.tag) {
-                                    return renderViewerDetails(result[0].viewer);
+                                    var response = result[0];
+                                    return React.createElement("div", undefined, renderViewerDetails(response.viewer), renderRepositoryList(response.viewer.repositories));
                                   } else {
                                     console.log(result[0]);
                                     return React.createElement("div", undefined, "error");
@@ -255,6 +292,8 @@ exports.component = component;
 exports.$pipe$unknown$great = $pipe$unknown$great;
 exports.$pipe$unknown$great$great = $pipe$unknown$great$great;
 exports.$pipe$unknown = $pipe$unknown;
+exports.renderEdgeNode = renderEdgeNode;
+exports.renderRepositoryList = renderRepositoryList;
 exports.renderViewerDetails = renderViewerDetails;
 exports.make = make$1;
 /* GetRepositoryListQuery Not a pure module */

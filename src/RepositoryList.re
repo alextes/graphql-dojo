@@ -4,11 +4,12 @@ module GetRepositoryList = [%graphql
     viewer {
       name
       email
-      repositories(first: 10) {
+      repositories(first: 10, orderBy: { field: STARGAZERS, direction: DESC }) {
         edges {
           node {
             id
             name
+            viewerHasStarred
           }
         }
       }
@@ -39,27 +40,41 @@ let (|?) = (opt, default) =>
   | Some(value) => value
   };
 
+let renderEdgeNode = node =>
+  node##viewerHasStarred ?
+    ReasonReact.string(node##name ++ {js|🌟|js}) :
+    ReasonReact.string(node##name ++ {js|😭|js});
+
 let renderRepositoryList = repositories =>
-  <ul>
-    (
-      ReasonReact.createDomElement(
-        "div",
-        ~props={"className": "whatever"},
-        Js.Array.map(
-          edge =>
-            <li>
-              (
-                switch (edge##node) {
-                | None => ReasonReact.string("No node")
-                | Some(node) => ReasonReact.string(node##name)
-                }
-              )
-            </li>,
-          repositories##edges |? [%raw {| [] |}],
-        ),
+  switch (repositories##edges) {
+  | None => <div> (ReasonReact.string("No repository edges")) </div>
+  | Some(edges) =>
+    <ul>
+      (
+        ReasonReact.createDomElement(
+          "div",
+          ~props={"className": "whatever"},
+          Js.Array.map(
+            edge =>
+              switch (edge) {
+              | None => <li> (ReasonReact.string("No edge")) </li>
+              | Some(edge) =>
+                <li>
+                  (
+                    switch (edge##node) {
+                    | None => ReasonReact.string("No node")
+                    | Some(node) => renderEdgeNode(node)
+                    /* ReasonReact.string(node##name) */
+                    }
+                  )
+                </li>
+              },
+            edges,
+          ),
+        )
       )
-    )
-  </ul>;
+    </ul>
+  };
 
 let renderViewerDetails = viewer =>
   <div>
