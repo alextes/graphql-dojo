@@ -10,7 +10,7 @@ let httpLink =
         Js.Dict.fromList([
           (
             "Authorization",
-            Js.Json.string("bearer TOKEN"),
+            Js.Json.string("bearer d2579cb52241b7c07a3effb92c16037999eb4e1b"),
           ),
         ]),
       ),
