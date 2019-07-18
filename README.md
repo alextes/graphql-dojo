@@ -1,5 +1,5 @@
 # graphql-dojo
-Graphql example written at the first ReasonConf! 🙌💣🙌
+Graphql example written at the first ReasonConf! 🙌🙌
 
 ## Run Project
 
